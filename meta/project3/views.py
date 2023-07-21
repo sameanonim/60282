@@ -13,14 +13,16 @@ class LessonListApiView(generics.ListAPIView):
 class LessonRetrieveApiView(generics.RetrieveAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    http_method_names = ['get', 'head']
 
-class LessonCreateApiView(generics.CreateAPIView):
-    queryset = Lesson.objects.all()
-
-class LessonUpdateApiView(generics.UpdateAPIView):
+class LessonCreateApiView(generics.ListCreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
 
-class LessonDeleteApiView(generics.DestroyAPIView):
+class LessonUpdateApiView(generics.RetrieveUpdateAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+
+class LessonDeleteApiView(generics.RetrieveDestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer

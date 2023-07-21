@@ -18,10 +18,6 @@ class User(AbstractUser):
         verbose_name = _('пользователь')
         verbose_name_plural = _('пользователи')
 
-class UserPermission(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='permissions')
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
-
 class Course(models.Model):
     title = models.CharField(_('название курса'), max_length=100)
     preview = models.ImageField(_('превью'), upload_to='course_previews/')
