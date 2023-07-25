@@ -35,7 +35,7 @@ class Lesson(models.Model):
     description = models.TextField(_('описание урока'))
     preview = models.ImageField(_('превью'), upload_to='lesson_previews/')
     video_link = models.URLField(_('ссылка на видео'))
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='уроки')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='lessons')
     
     def __str__(self):
         return self.title
@@ -43,3 +43,26 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = _('урок')
         verbose_name_plural = _('уроки')
+
+class Payment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('пользователь'))
+    payment_date = models.DateField(_('дата оплаты'))
+    course_or_lesson = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='оплаченные_курсы_и_уроки',
+        verbose_name=_('оплаченный курс или урок с указанием курса или урока')
+    )
+    amount = models.DecimalField(_('сумма оплаты'), max_digits=15, decimal_places=2)
+    payment_method = models.CharField(
+        _('способ оплаты'),
+        max_length=15,
+        choices=[('cash', 'наличные'), ('bank_transfer', 'перевод на счет')]
+    )
+
+    def __str__(self):
+        return f"{self.user.email} - {self.course_or_lesson}"
+
+    class Meta:
+        verbose_name = _('платеж')
+        verbose_name_plural = _('платежи')
