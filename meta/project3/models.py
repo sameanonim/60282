@@ -1,4 +1,5 @@
-from django.contrib.auth.models import AbstractUser, Permission
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -22,6 +23,7 @@ class Course(models.Model):
     title = models.CharField(_('название курса'), max_length=100)
     preview = models.ImageField(_('превью'), upload_to='course_previews/')
     description = models.TextField(_('описание курса'))
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self):
         return self.title
@@ -36,6 +38,7 @@ class Lesson(models.Model):
     preview = models.ImageField(_('превью'), upload_to='lesson_previews/')
     video_link = models.URLField(_('ссылка на видео'))
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='lessons')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self):
         return self.title

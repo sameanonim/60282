@@ -20,7 +20,7 @@ urlpatterns = [
     path('lessons/delete/<int:pk>/', LessonDeleteApiView.as_view(), name='lesson-delete'),
     path('payments/', PaymentListApiView.as_view(), name='payments'),
     path('token/', UserTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh', UserTokenRefreshView.as_view(), name='token-refresh')
+    path('token/refresh', UserTokenRefreshView.as_view(), name='token-refresh'),
 ]
 
 if settings.DEBUG:
