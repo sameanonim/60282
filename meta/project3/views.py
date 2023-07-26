@@ -2,8 +2,9 @@ from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Course, Lesson, Payment
-from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
+from .serializers import CourseSerializer, LessonSerializer, MyTokenObtainPairSerializer, PaymentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -42,3 +43,6 @@ class PaymentListApiView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['payment_method','course_or_lesson']
     ordering_fields = ['payment_date']
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer

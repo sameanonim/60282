@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .apps import Project3Config
-from .views import CourseViewSet, LessonDeleteApiView, LessonListApiView, LessonRetrieveApiView, LessonCreateApiView, LessonUpdateApiView, PaymentListApiView
+from .views import CourseViewSet, LessonDeleteApiView, LessonListApiView, LessonRetrieveApiView, LessonCreateApiView, LessonUpdateApiView, PaymentListApiView, MyTokenObtainPairView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -20,6 +20,7 @@ urlpatterns = [
     path('lessons/update/<int:pk>/', LessonUpdateApiView.as_view(), name='lesson-update'),
     path('lessons/delete/<int:pk>/', LessonDeleteApiView.as_view(), name='lesson-delete'),
     path('payments/', PaymentListApiView.as_view(), name='payments')
+    path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
 ]
 
 if settings.DEBUG:
