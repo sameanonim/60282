@@ -23,7 +23,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = ['payment_method', 'course_or_lesson']
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+class TokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)

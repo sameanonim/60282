@@ -1,8 +1,9 @@
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from .models import Course, Lesson, Payment
-from .serializers import CourseSerializer, LessonSerializer, MyTokenObtainPairSerializer, PaymentSerializer
+from .serializers import CourseSerializer, LessonSerializer, TokenObtainPairSerializer, PaymentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -44,5 +45,8 @@ class PaymentListApiView(generics.ListAPIView):
     filterset_fields = ['payment_method','course_or_lesson']
     ordering_fields = ['payment_date']
 
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+class UserTokenObtainPairView(TokenObtainPairView):
+    serializer_class = TokenObtainPairSerializer
+
+class UserTokenRefreshView(TokenObtainPairView):
+    pass
