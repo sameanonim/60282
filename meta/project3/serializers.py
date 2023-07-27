@@ -2,7 +2,6 @@ from datetime import timedelta
 from rest_framework import serializers
 from .models import Course, Lesson, Payment
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
