@@ -1,6 +1,7 @@
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from meta.project3.pagination import MyPagination
 from .permissions import IsInModeratorGroup, IsOwnerOrReadOnly
 from .models import Course, Lesson, Payment
 from .serializers import CourseSerializer, LessonSerializer, MyTokenObtainPairSerializer, MyTokenRefreshSerializer, PaymentSerializer
@@ -12,6 +13,13 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated, IsInModeratorGroup, IsOwnerOrReadOnly]
+    pagination_class = MyPagination
+
+    def get(self, request):
+        queryset = self.queryset
+        paginated_queryset = self.paginate_queryset(queryset)
+        serializer = CourseSerializer(paginated_queryset, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @api_view(['GET'])
     def course_list(request):
@@ -23,6 +31,13 @@ class LessonListApiView(generics.ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    pagination_class = MyPagination
+
+    def get(self, request):
+        queryset = self.queryset
+        paginated_queryset = self.paginate_queryset(queryset)
+        serializer = LessonSerializer(paginated_queryset, many=True)
+        return self.get_paginated_response(serializer.data)
 
 class LessonRetrieveApiView(generics.RetrieveAPIView):
     queryset = Lesson.objects.all()
