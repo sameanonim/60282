@@ -161,3 +161,6 @@ cython_debug/
 meta/course_previews/
 meta/lesson_previews/
 meta/project3/migrations/
+.idea/inspectionProfiles/
+.idea/dictionaries/
+.idea/

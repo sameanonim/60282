@@ -1,5 +1,6 @@
 from datetime import timedelta
 from rest_framework import serializers
+from .validators import EvenYoutubeValidator
 from .models import Course, Lesson, Payment
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
@@ -7,6 +8,7 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = '__all__'
+        validators = [EvenYoutubeValidator(fields=['title', 'description', 'video_link'])]
 
 class CourseSerializer(serializers.ModelSerializer):
     number_of_lessons = serializers.SerializerMethodField(read_only=True)
