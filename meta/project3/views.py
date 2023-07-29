@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from meta.project3.pagination import MyPagination
 from .permissions import IsInModeratorGroup, IsOwnerOrReadOnly
-from .models import Course, Lesson, Payment
-from .serializers import CourseSerializer, LessonSerializer, MyTokenObtainPairSerializer, MyTokenRefreshSerializer, PaymentSerializer
+from .models import Course, Lesson, Payment, Subscription
+from .serializers import CourseSerializer, LessonSerializer, MyTokenObtainPairSerializer, MyTokenRefreshSerializer, PaymentSerializer, SubscriptionSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.permissions import IsAuthenticated
@@ -73,3 +73,43 @@ class UserTokenObtainPairView(TokenObtainPairView):
 
 class UserTokenRefreshView(TokenRefreshView):
     serializer_class = MyTokenRefreshSerializer
+
+class SubscriptionCreateApiView(generics.CreateAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        course_id = request.data.get('course_id')
+        
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response({'error': 'Курс не найден'}, status=400)
+        
+        subscription, created = Subscription.objects.get_or_create(user=user, course=course)
+        subscription.subscribed = True
+        subscription.save()
+
+        return Response({'success': 'Подписка установлена'}, status=200)
+    
+class SubscriptionDeleteApiView(generics.DestroyAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+
+    def delete(self, request, *args, **kwargs):
+
+        user = request.user
+        course_id = request.query_params.get('course_id')
+        
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response({'error': 'Курс не найден'}, status=400)
+        
+        subscription = Subscription.objects.filter(user=user, course=course, subscribed=True).first()
+        if subscription:
+            subscription.subscribed = False
+            subscription.save()
+
+        return Response({'success': 'Подписка удалена'}, status=200)

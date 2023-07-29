@@ -28,6 +28,13 @@ class Course(models.Model):
     def __str__(self):
         return self.title
     
+    def is_user_subscribed(self, user):
+        try:
+            Subscription.objects.get(user=user, course=self, subscribed=True)
+            return True
+        except Subscription.DoesNotExist:
+            return False
+    
     class Meta:
         verbose_name = _('курс')
         verbose_name_plural = _('курсы')
@@ -69,3 +76,15 @@ class Payment(models.Model):
     class Meta:
         verbose_name = _('платеж')
         verbose_name_plural = _('платежи')
+
+class Subscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('user'))
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name=_('курс'))
+    subscribed = models.BooleanField(_('подписан на обновления'), default=False)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.course.title}"
+
+    class Meta:
+        verbose_name = _('подписка')
+        verbose_name_plural = _('подписки')

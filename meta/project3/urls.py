@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .apps import Project3Config
-from .views import CourseViewSet, LessonDeleteApiView, LessonListApiView, LessonRetrieveApiView, LessonCreateApiView, LessonUpdateApiView, PaymentListApiView, UserTokenObtainPairView, UserTokenRefreshView
+from .views import CourseViewSet, LessonDeleteApiView, LessonListApiView, LessonRetrieveApiView, LessonCreateApiView, LessonUpdateApiView, PaymentListApiView, SubscriptionCreateApiView, SubscriptionDeleteApiView, UserTokenObtainPairView, UserTokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -21,6 +21,8 @@ urlpatterns = [
     path('payments/', PaymentListApiView.as_view(), name='payments'),
     path('token/', UserTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh', UserTokenRefreshView.as_view(), name='token-refresh'),
+    path('subscriptions/create/', SubscriptionCreateApiView.as_view(), name='subscription-create'),
+    path('subscriptions/delete/', SubscriptionDeleteApiView.as_view(), name='subscription-delete'),
 ]
 
 if settings.DEBUG:
