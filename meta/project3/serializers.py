@@ -8,7 +8,7 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = '__all__'
-        validators = [EvenYoutubeValidator(field=['title', 'description', 'video_link'])]
+        validators = [EvenYoutubeValidator(field='video_link')]
 
 class CourseSerializer(serializers.ModelSerializer):
     number_of_lessons = serializers.SerializerMethodField(read_only=True)
