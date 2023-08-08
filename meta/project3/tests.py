@@ -50,26 +50,42 @@ class LessonAPITestCase(APITestCase):
     
 class SubscriptionAPITestCase(APITestCase):
     def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create(email="testuser@mail.ru", password="testpass")
-        self.course = Course.objects.create(title="Test Course", description="Test Description")
-
-    def test_subscribe_to_course(self):
+        self.user = User.objects.create(email='test@example.com', password='testpassword')
+        self.course = Course.objects.create(title='Test Course')
         self.client.force_authenticate(user=self.user)
-        url = '/subscriptions/create/'
-        csrf_client = Client()
-        csrf_token = csrf_client.cookies['csrftoken'].value
-        print(csrf_token)
-        data = {'course_id': self.course.id, 'csrfmiddlewaretoken': csrf_token}
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.client.enforce_csrf_checks = True
+        self.client.get('/token/')
 
-    def test_unsubscribe_from_course(self):
-        self.client.force_authenticate(user=self.user)
-        subscription = Subscription.objects.create(user=self.user, course=self.course, subscribed=True)
-        url = f'/subscriptions/delete/{subscription.id}/'
-        response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    def test_create_subscription(self):
+        csrf_token = self.client.get('/token/').cookies['csrftoken'].value
+        response = self.client.post('/subscriptions/create/', {'course_id': self.course.id}, HTTP_X_CSRFTOKEN=csrf_token)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'success': 'Подписка установлена'})
+        subscription = Subscription.objects.filter(user=self.user, course=self.course).first()
+        self.assertIsNotNone(subscription)
+        self.assertTrue(subscription.subscribed)
+
+    def test_create_subscription_course_not_found(self):
+        csrf_token = self.client.get('/token/').cookies['csrftoken'].value
+        response = self.client.post('/subscriptions/create/', {'course_id': 999}, HTTP_X_CSRFTOKEN=csrf_token)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {'error': 'Курс не найден'})
+
+    def test_delete_subscription(self):
+        Subscription.objects.create(user=self.user, course=self.course, subscribed=True)
+        csrf_token = self.client.get('/token/').cookies['csrftoken'].value
+        response = self.client.delete(f'/subscriptions/delete/?course_id={self.course.id}', HTTP_X_CSRFTOKEN=csrf_token)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'success': 'Подписка удалена'})
+        subscription = Subscription.objects.filter(user=self.user, course=self.course).first()
+        self.assertIsNotNone(subscription)
+        self.assertFalse(subscription.subscribed)
+
+    def test_delete_subscription_course_not_found(self):
+        csrf_token = self.client.get('/token/').cookies['csrftoken'].value
+        response = self.client.delete('/subscriptions/delete/?course_id=999', HTTP_X_CSRFTOKEN=csrf_token)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {'error': 'Курс не найден'})
 
     def tearDown(self):
         self.course.delete()
