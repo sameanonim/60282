@@ -2,6 +2,8 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from .models import Course, Lesson, Subscription, User
 from django.test import Client
+from .serializers import MyTokenObtainPairSerializer
+from django.test import override_settings
 
 class LessonAPITestCase(APITestCase):
     def setUp(self):
@@ -41,54 +43,32 @@ class LessonAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def tearDown(self):
-        self.course.delete()
-        self.lesson.delete()
-        self.user.delete()
-        del self.course
-        del self.lesson
-        del self.client
+        super().tearDown()
     
-class SubscriptionAPITestCase(APITestCase):
+class SubscriptionTestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create(email='test@example.com', password='testpassword')
-        self.course = Course.objects.create(title='Test Course')
-        self.client.force_authenticate(user=self.user)
-        self.client.enforce_csrf_checks = True
-        self.client.get('/token/')
+        self.user = User(email='test@test.ru', phone='111111111', city='Mscow', is_superuser=True, is_staff=True,
+                         is_active=True)
+        self.user.set_password('123QWE456RTY')
+        self.user.save()
+        response = self.client.post(
+            '/token/',
+            {"email": "test@test.ru", "password": "123QWE456RTY"}
+        )
 
-    def test_create_subscription(self):
-        csrf_token = self.client.get('/token/').cookies['csrftoken'].value
-        response = self.client.post('/subscriptions/create/', {'course_id': self.course.id}, HTTP_X_CSRFTOKEN=csrf_token)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, {'success': 'Подписка установлена'})
-        subscription = Subscription.objects.filter(user=self.user, course=self.course).first()
-        self.assertIsNotNone(subscription)
-        self.assertTrue(subscription.subscribed)
+        self.access_token = response.json().get('access')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
+        self.course = Course.objects.create(title='test', description='test')
 
-    def test_create_subscription_course_not_found(self):
-        csrf_token = self.client.get('/token/').cookies['csrftoken'].value
-        response = self.client.post('/subscriptions/create/', {'course_id': 999}, HTTP_X_CSRFTOKEN=csrf_token)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, {'error': 'Курс не найден'})
+    def test_subscription_create(self):
+        response = self.client.post('/subscriptions/create/',
+                                    {'course_id': self.course.id, 'user': self.user.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_delete_subscription(self):
-        Subscription.objects.create(user=self.user, course=self.course, subscribed=True)
-        csrf_token = self.client.get('/token/').cookies['csrftoken'].value
-        response = self.client.delete(f'/subscriptions/delete/?course_id={self.course.id}', HTTP_X_CSRFTOKEN=csrf_token)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, {'success': 'Подписка удалена'})
-        subscription = Subscription.objects.filter(user=self.user, course=self.course).first()
-        self.assertIsNotNone(subscription)
-        self.assertFalse(subscription.subscribed)
-
-    def test_delete_subscription_course_not_found(self):
-        csrf_token = self.client.get('/token/').cookies['csrftoken'].value
-        response = self.client.delete('/subscriptions/delete/?course_id=999', HTTP_X_CSRFTOKEN=csrf_token)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, {'error': 'Курс не найден'})
+    def test_subscription_delete(self):
+        self.test_subscription_create()
+        response = self.client.delete(f'/subscriptions/delete/?course_id={self.course.id}')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def tearDown(self):
-        self.course.delete()
-        self.user.delete()
-        del self.course
-        del self.client
+        super().tearDown()

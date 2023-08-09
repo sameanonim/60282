@@ -119,4 +119,4 @@ class SubscriptionDeleteApiView(generics.DestroyAPIView):
             subscription.subscribed = False
             subscription.save()
 
-        return Response({'success': 'Подписка удалена'}, status=200)
+        return Response({'success': 'Подписка удалена'}, status=204)

@@ -29,15 +29,15 @@ class PaymentSerializer(serializers.ModelSerializer):
 class MyTokenRefreshSerializer(TokenRefreshSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        token = self.get_token(self.user)
-        token.set_exp(lifetime=timedelta(days=7))
+        refresh = self.get_token(self.user)
+        refresh.set_exp(lifetime=timedelta(days=7))
+        data['refresh'] = str(refresh)
         return data
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['username'] = user.username
         token['email'] = user.email
         return token
 

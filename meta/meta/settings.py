@@ -147,3 +147,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+#для тестирования
+#CSRF_COOKIE_SECURE = False
+#CSRF_COOKIE_SAMESITE = 'None'
