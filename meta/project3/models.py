@@ -26,7 +26,10 @@ class Course(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self):
-        return self.title
+        subscriptions = Subscription.objects.filter(course=self)
+        subscribed_users = [subscription.user.email for subscription in subscriptions if subscription.subscribed]
+        subscribed_users_str = ', '.join(subscribed_users)
+        return f"курс {self.title} - Подписаны: {subscribed_users_str}"
     
     def is_user_subscribed(self, user):
         try:
@@ -48,7 +51,7 @@ class Lesson(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self):
-        return self.title
+        return self.title 
     
     class Meta:
         verbose_name = _('урок')
