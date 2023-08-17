@@ -82,7 +82,7 @@ WSGI_APPLICATION = "meta.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
+        'NAME': 'cursed8',
         'USER': 'postgres',
         #'PASSWORD': os.getenv('DB_PASSWORD'),
         'PASSWORD': 'mysecretpassword',
