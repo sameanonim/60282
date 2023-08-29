@@ -6,7 +6,7 @@ Deploy to stage:
   script:
       - cp $ENV_STAGE .env
       - bash deploy.sh
-      - python tests.py
+      - python manage.py tests
   target:
       - main
   tags:
